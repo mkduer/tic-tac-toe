@@ -1,0 +1,9 @@
+# local ignore
+.idea/
+Include/
+Lib/
+Scripts/
+pyvenv.cfg
+__pycache__
+*.swp
+
