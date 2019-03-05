@@ -8,6 +8,10 @@ class Board:
     def __init__(self):
         self.state = np.zeros((C.DIMENSION, C.DIMENSION), dtype=int)
         self.state.fill(-1)
+        self.end_game = False
+        self.static_board()
+        self.display_flat()
+        self.display()
 
     def winning_state(self, last_added: int):
         """
@@ -32,12 +36,16 @@ class Board:
             return 0
 
         # add piece to position
-        x, y = self.map_position(position)
-        print(f'add piece to position {position} found at coordinates {x}, {y}')
-        self.state[x][y] = piece
+        print(f'add piece to position {position} in {self.state.ravel()}')
+        self.state.ravel()[position] = piece
+        self.display_flat()
         return 1
 
     def random_legal_move(self) -> int:
+        """
+        Generates a random legal move if there are any remaining
+        :return: legal position or -1 if no legal positions remain
+        """
         coordinates = self.collect_legal_moves()
 
         # if there are no legal moves remaining
@@ -52,6 +60,10 @@ class Board:
         return choice(positions)
 
     def collect_legal_moves(self) -> (int, int):
+        """
+        If there are any viable legal moves, their coordinates are returned
+        :return: list of coordinates
+        """
         legal_moves = np.where(self.state < 0)[0], np.where(self.state < 0)[1]
 
         # if there are no legal moves remaining, return invalid coordinates
@@ -80,10 +92,13 @@ class Board:
             return 9
 
         # if the position was specified, check if it is a legal move
-        x, y = self.map_position(position)
-        if (x, y) in coordinates:
+        print(f'check if position {position} in {self.state.ravel()} is legal')
+        self.display_flat()
+        if self.state.ravel()[position] == -1:
+            print(f'LEGAL')
             return position
         else:
+            print(f'NOT LEGAL')
             return -1
 
     def map_coordinates(self, coordinates: [(int, int)]) -> [int]:
@@ -133,61 +148,45 @@ class Board:
 
         return positions
 
-    def map_position(self, position: int) -> (int, int):
+    def alternate_piece(self, curent_piece: int) -> int:
         """
-        Maps position over to coordinates. Example:
+        Alternates to the opposite piece
+        :param curent_piece: value of current piece: 0 or 1
+        :return: alternate piece: 1 or 0
+        """
+        if not curent_piece:
+            return 1
+        return 0
 
-        0 | 1 | 2      (0, 0) | (1, 0) | (2, 0)
-        ---------      -----------------------
-        3 | 4 | 5  ~>  (0, 1) | (1, 1) | (2, 1)
-        ---------      -----------------------
-        6 | 7 | 8      (0, 2) | (1, 2) | (2, 2)
+    def random_board(self, moves: int=2) -> int:
+        """
+        Creates a randomly generated, legal board that may be a set number of moves into a game
+        :param move: number of moves into the game, defaults to 2 moves
+        :return 1 if a random board is successfully created, 0 otherwise
+        """
+        # if an invalid numbr of moves is selected, the board is not generated
+        if moves < 0 or moves > 8:
+            return 0
 
-        :param position: position to map
-        :return: the (x, y) coordinates
-        """
-        if position == -2:
-            raise ValueError(f'{position} is an invalid position on the board and cannot be mapped')
-        x = 0
-        y = 0
-        if -1 < position < 3:
-            y = 0
-            if position == 0:
-                x = 0
-            elif position == 1:
-                x = 1
-            else:
-                x = 2
-        elif 2 < position < 6:
-            if position == 3:
-                x = 0
-            elif position == 4:
-                x = 1
-            else:
-                x = 2
-            y = 1
-        else:
-            y = 2
-            if position == 6:
-                x = 0
-            elif position == 7:
-                x = 1
-            else:
-                x = 2
-        return x, y
+        # create the board, one legal move at a time
+        count = 0
+        piece = 0
+        while count < moves and not self.end_game:
+            position = self.random_legal_move()
 
-    def random_board(self, move: int=2):
-        """
-        Creates a randomly generated, legal board that is defaulted to at least two moves into the game
-        :param move: number of moves into the game
-        """
-        if move < 1:
-            pass
-        # TODO
+            if position < 0 or not self.add_piece(piece, position):
+                self.end_game = True
+                return 0
+            self.display_flat()
+            self.display()
+            count += 1
+            piece = self.alternate_piece(piece)
+        print(f'RANDOM BOARD GENERATED =============')
+        return 1
 
     def static_board(self):
         """
-        Creates a statically set board: [O, -2, 1, -2, 0, -2, -2, -2, 1]
+        Creates a statically set board: [0, -1, 1, -1, 0, -1, -1, -1, 1]
 
         O |   | X
         ---------
@@ -196,7 +195,9 @@ class Board:
           |   | X
 
         """
-        self.state = [0, -2, 1, -2, 0, -2, -2, -2, 1]
+        state = [0, -1, 1, -1, 0, -1, -1, -1, 1]
+        state_np = np.asarray(state, dtype=int)
+        self.state = np.reshape(state_np, (C.DIMENSION, C.DIMENSION))
 
     def piece(self, value: int) -> str:
         """
