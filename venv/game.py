@@ -5,7 +5,6 @@ class Game:
     def __init__(self):
         self.play = True
         self.board = Board()
-        self.board.random_board()
         self.max_player = 0
         self.min_player = 1
         self.current_player = 0
@@ -71,7 +70,8 @@ def main():
         move += 1
         print(f'\nMove {move}')
 
-        game.random_move()
+        if game.random_move() < 0:
+            game.running(False)
         game.switch_player()
         game.display()
 

@@ -9,9 +9,7 @@ class Board:
         self.state = np.zeros((C.DIMENSION, C.DIMENSION), dtype=int)
         self.state.fill(-1)
         self.end_game = False
-        self.static_board()
-        self.display_flat()
-        self.display()
+        self.random_board()
 
     def winning_state(self, last_added: int):
         """
@@ -36,7 +34,6 @@ class Board:
             return 0
 
         # add piece to position
-        print(f'add piece to position {position} in {self.state.ravel()}')
         self.state.ravel()[position] = piece
         self.display_flat()
         return 1
@@ -46,17 +43,12 @@ class Board:
         Generates a random legal move if there are any remaining
         :return: legal position or -1 if no legal positions remain
         """
-        coordinates = self.collect_legal_moves()
-
-        # if there are no legal moves remaining
-        if coordinates == (-1, -1):
-            return -1
-
         # find legal positions
-        positions = self.map_coordinates(coordinates)
-        if not positions:
+        positions = np.where(self.state.ravel() < 0)[0]
+
+        if positions.size < 1:
             return -1
-        print(f'Legal Positions: {positions}')
+
         return choice(positions)
 
     def collect_legal_moves(self) -> (int, int):
@@ -92,61 +84,11 @@ class Board:
             return 9
 
         # if the position was specified, check if it is a legal move
-        print(f'check if position {position} in {self.state.ravel()} is legal')
         self.display_flat()
         if self.state.ravel()[position] == -1:
-            print(f'LEGAL')
             return position
         else:
-            print(f'NOT LEGAL')
             return -1
-
-    def map_coordinates(self, coordinates: [(int, int)]) -> [int]:
-        """
-        Maps coordinates over to positions: Example:
-
-        0, 0) | (1, 0) | (2, 0)       0 | 1 | 2
-        -----------------------       ---------
-        (0, 1) | (1, 1) | (2, 1)  ~>  3 | 4 | 5
-        -----------------------       ---------
-        (0, 2) | (1, 2) | (2, 2)      6 | 7 | 8
-
-        :param coordinates:
-        :return: positions as a list of integers
-        """
-        positions = []
-
-        if coordinates == []:
-            return coordinates
-
-        x, y = zip(*coordinates)
-        length = len(x)
-
-        # figure out correlating positions
-        for i in range(length):
-            if y[i] == 0:
-                if x[i] == 0:
-                    positions.append(0)
-                elif x[i] == 1:
-                    positions.append(1)
-                else:
-                    positions.append(2)
-            elif y[i] == 1:
-                if x[i] == 0:
-                    positions.append(3)
-                elif x[i] == 1:
-                    positions.append(4)
-                else:
-                    positions.append(5)
-            else:
-                if x[i] == 0:
-                    positions.append(6)
-                elif x[i] == 1:
-                    positions.append(7)
-                else:
-                    positions.append(8)
-
-        return positions
 
     def alternate_piece(self, curent_piece: int) -> int:
         """
@@ -181,7 +123,6 @@ class Board:
             self.display()
             count += 1
             piece = self.alternate_piece(piece)
-        print(f'RANDOM BOARD GENERATED =============')
         return 1
 
     def static_board(self):
