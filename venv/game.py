@@ -1,4 +1,5 @@
 from board import Board
+from strategy import Strategy
 import constant as C
 
 class Game:
@@ -7,13 +8,24 @@ class Game:
         self.board = Board()
         self.max_player = 0
         self.min_player = 1
-        self.current_player = 0
+        self.current_player = self.board.get_current_player()
         self.players = [self.max_player, self.min_player]
         self.winner = -1
 
-    def reset(self):
-        self.board.reset()
-        self.current_player = 0
+    def analyze_strategy(self):
+        """
+        Applies game theory to analyze strategies from the current board state
+        """
+        strategy = Strategy(self.board)
+        strategy.analysis()
+        # strategy.display_payoff_table() # TODO
+
+    def reset(self) -> int:
+        """
+        Resets the game and returns the next player for the new board state
+        :return:
+        """
+        self.current_player = self.board.reset()
         self.winner = -1
 
     def running(self, playing: bool=True) -> (int, int):
@@ -87,11 +99,16 @@ def main():
 
     # run total games
     while game_count < C.TOTAL_GAMES:
-        game.reset()
+        if game_count > 0:
+            game.reset()
+
         run_game = 1
         game.display()
+        game.analyze_strategy()
 
         # while the game is running, make moves
+        # TODO: uncomment after strategy is implemented
+        """
         while run_game > 0:
             if game.random_move() < 0:
                 game.running(False)
@@ -101,6 +118,7 @@ def main():
             game.switch_player()
 
         end_game(run_game, winner)
+        """
         game_count += 1
 
 
