@@ -43,11 +43,13 @@ class Board:
 
         print(f'^PARENT: legal positions in parent: {legal_positions}\n\n')
         for position in legal_positions:
+            all_positions = []
             child = Board(deepcopy(self.state), self.move_count, self.current_player, child=True)
             piece = child.alternate_player(self.current_player)
             child.add_piece(piece=piece, position=position)
-            legal_positions.remove(position)
-            self.children.append((child, piece, position, deepcopy(legal_positions)))
+            all_positions = deepcopy(legal_positions)
+            all_positions.remove(position)
+            self.children.append((child, piece, position, deepcopy(all_positions)))
 
         return self.children
 

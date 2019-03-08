@@ -1,4 +1,5 @@
 from board import Board
+from math import nan
 
 
 class Sample:
@@ -16,10 +17,13 @@ class Sample:
         """
         Display sample details
         """
-        print(f'({self.piece(self.player1)}, {self.piece(self.player2)}) '
+        # TODO: uncomment
+        """
+        print(f'\nPAYOFF SAMPLE: ({self.piece(self.player1)}, {self.piece(self.player2)}) '
               f'added to ({self.p1_position}, {self.p2_position})')
         self.display_state(self.state)
-        print(f'PAYOFF: {self.payoff}')
+        """
+        print(f'payoff: {self.payoff}')
 
     def display_state(self, state: [int]):
         """
