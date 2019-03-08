@@ -23,20 +23,12 @@ class Strategy:
 
         # Initialize the payoff table
         self.initialize_table()
-        print(f'======== INIT PAYOFF TABLE ({self.row}x{self.col}) ========')
-        for payoff in self.payoff_table:
-            print(payoff)
 
         # Monte Carlo Sampling
         self.process_children()
 
-        # Display Results
-        print(f'======== FINAL PAYOFF TABLE ({self.row}x{self.col}) ========')
-        for payoff in self.payoff_table:
-            print(payoff)
-        for payoff in self.payoff_table:
-            for p in payoff:
-                p.display_sample()
+        # Display Results in Payoff Table
+        self.display_payoff_table()
 
     def initialize_table(self):
         """
@@ -184,7 +176,6 @@ class Strategy:
 
         return -1, -1 ,-1
 
-
     def game_state(self, winner: int) -> (int, int, int):
         """
         Returns payoff if board game will no longer change based on winner value
@@ -215,31 +206,13 @@ class Strategy:
         """
         return board.discover_children()
 
-    def get_state(self) -> [int]:
-        """
-        :return: returns the board's current state
-        """
-        return self.state
-
-
-    def create_payoff_table(self):
-        """
-        Samples from the starting board state to generate a (0, 1, -1, -2) probability out of a total constant sampling
-        where the returned result reflects (Number of times O won, Number of times X won, Stalemates)
-        off of the next two possible moves in the game.
-        """
-
-        # if there are no children
-        if len(self.children) < 1:
-            return (0, 0, 0)
-
-        # sample each child and save the probabilities
-        for child in self.children:
-            payoff = self.monte_carlo_sampling(child)
-            self.payoff_table.append(payoff)
-
     def display_payoff_table(self):
         """
         Displays payoff table
         """
-        print(f'PAYOFF TABLE:\n{self.payoff_table}')
+        print(f'======== FINAL PAYOFF TABLE ({self.row}x{self.col}) ========')
+        for payoff in self.payoff_table:
+            print(payoff)
+        for payoff in self.payoff_table:
+            for p in payoff:
+                p.display_sample()
