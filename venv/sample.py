@@ -17,13 +17,11 @@ class Sample:
         """
         Display sample details
         """
-        # TODO: uncomment
-        """
-        print(f'\nPAYOFF SAMPLE: ({self.piece(self.player1)}, {self.piece(self.player2)}) '
-              f'added to ({self.p1_position}, {self.p2_position})')
+        print(f'\n=== SAMPLE ==='
+              f'\n({self.piece(self.player1)}, {self.piece(self.player2)}) '
+              f'added to ({self.p1_position}, {self.p2_position})'
+              f'\npayoff: {self.payoff}')
         self.display_state(self.state)
-        """
-        print(f'payoff: {self.payoff}')
 
     def display_state(self, state: [int]):
         """
