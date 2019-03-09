@@ -41,7 +41,6 @@ class Board:
         if len(legal_positions) < 1:
             return
 
-        print(f'^PARENT: legal positions in parent: {legal_positions}\n\n')
         for position in legal_positions:
             all_positions = []
             child = Board(deepcopy(self.state), self.move_count, self.current_player, child=True)

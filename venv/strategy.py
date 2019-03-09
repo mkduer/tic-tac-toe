@@ -23,10 +23,6 @@ class Strategy:
 
         # Initialize the payoff table
         self.initialize_table()
-        print(f'INITIALIZED TABLE:')
-        for payoff in self.payoff_table:
-            print(payoff)
-        print(f'\n')
 
         # Monte Carlo Sampling
         self.process_children()
@@ -56,7 +52,6 @@ class Strategy:
 
         # go through all of player 1's legal moves
         for board, piece, p1_position, legal_positions in self.children:
-            print(f'PLAYER1: {player1}')
             moves_remain = True
             payoff = (-1, -1 , -1)
             other_piece = self.other_player(piece)
@@ -67,23 +62,15 @@ class Strategy:
             if len(legal_positions) < 1 or winner == 0 or winner == 1:
                 moves_remain = False
                 payoff = self.monte_carlo_sampling(board, piece, p1_position, moves_remain=moves_remain)
-                print(f'FIRST PLAYER\'s payoff: {payoff} and Board State:')
-                board.display()
 
                 for col in range(self.col):
-                    print(f'SAMPLE being added to payoff table[{player1}][{col}] with payoff {payoff}')
                     self.payoff_table[player1][col] = Sample(deepcopy(board.state), piece, other_piece,
                                                          p1_position, nan, deepcopy(payoff))
 
             # If valid moves remain, go through all of them to represent player 2's reponses
             if moves_remain:
-                print(f'FIRST PLAYER\'s position {p1_position}, current payoff: {payoff} and'
-                      f'\nBoard State (continuing to second player):')
-                board.display()
-
                 for position in range(self.col):
                     moves_remain = True
-                    print(f'PLAYER2: {player2}')
                     sample_board = Board(deepcopy(board.state), board.move_count, board.current_player, child=True)
                     _, winner = sample_board.add_piece(other_piece, position=legal_positions[position])
 
@@ -91,22 +78,15 @@ class Strategy:
                         moves_remain = False
                         payoff = self.monte_carlo_sampling(sample_board, other_piece, legal_positions[position],
                                                            moves_remain=moves_remain)
-                        print(f'SECOND PLAYER\'s payoff: {payoff} and Board State:')
-                        sample_board.display()
-
+                    # start sampling
                     if moves_remain:
-                        # process game_state and winner values and get sample values
-                        print(f'\nSECOND PLAYER\'s position {legal_positions[position]}, current payoff: {payoff} and'
-                              f'\nBoard State:')
-                        sample_board.display()
-
-                        # start sampling
                         payoff = self.monte_carlo_sampling(sample_board, other_piece, legal_positions[position])
 
                     # save the Sample to the specific coordinate it belongs to in the payoff table
-                    print(f'SAMPLE being added to payoff table[{player1}][{player2}] with payoff {payoff}')
                     self.payoff_table[player1][player2] = Sample(deepcopy(sample_board.state), piece, other_piece, p1_position,
                                                          legal_positions[position], deepcopy(payoff))
+
+                    # set payoff table location according to relevant players
                     player2 += 1
                     if player2 == self.col:
                         player2 = 0
@@ -123,7 +103,6 @@ class Strategy:
         """
         # if there were no legal moves after player 1 placed its piece
         if not moves_remain:
-            print(f'NO LEGAL MOVES after PLAYER {piece} placed its piece in position {position}')
             _, winner = board.winning_state(piece, position)
             return self.game_state(winner)
 
@@ -133,7 +112,6 @@ class Strategy:
         X_total = 0
         stalemates = 0
         while count < C.SAMPLES:
-            print(f'START mcmc sampling')
             O_won, X_won, no_win = self.sample_run(deepcopy(board))
             if (O_won, X_won, no_win) == (-1, -1, -1):
                 assert('An error occurred with the gameplay. These values should not be returned')
@@ -151,8 +129,6 @@ class Strategy:
         :return: An integer 1 representing whether there was a win or stalemate, zeros for all other possible outcomes
                  A triplet of (-1, -1, -1) is returned if there was an error in the gameplay
         """
-        print('START SAMPLE RUN with state:')
-        board.display()
         end_game = False
 
         # run the game until an endgame is reached
@@ -160,23 +136,16 @@ class Strategy:
             position = board.random_legal_move()
             player = board.get_current_player()
             player = board.alternate_player(player)
-            print(f'player: {player}, position: {position}')
             _, winner = board.add_piece(player, position)
-            print(f'new state with winner = {winner}:')
-            board.display()
             if winner == -1:
                 end_game = True
-                print(f'stalemate')
                 return 0, 0, 1  # stalemate
             elif winner == 0:
                 end_game = True
-                print(f'O won')
                 return 1, 0, 0  # O won
             elif winner == 1:
                 end_game = True
-                print(f'X won')
                 return 0, 1, 0  # X won
-            print(f'Continuing game')
 
         return -1, -1 ,-1
 
@@ -214,12 +183,9 @@ class Strategy:
         """
         Displays payoff table
         """
-        print(f'======== FINAL PAYOFF TABLE ({self.row}x{self.col}) ========')
+        print(f'======== PAYOFF TABLE ({self.row}x{self.col}) ========')
         for payoff in self.payoff_table:
             print(payoff)
         for payoff in self.payoff_table:
             for p in payoff:
-                if p is None:
-                    print(f'FIX ME -- None Value')
-                else:
-                    p.display_sample()
+                p.display_sample()

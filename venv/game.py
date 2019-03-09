@@ -103,11 +103,15 @@ def main():
             game.reset()
 
         run_game = 1
+
+        print('\nSTARTING BOARD:')
         game.display()
+        print('\n')
         game.analyze_strategy()
 
         # while the game is running, make moves
         # TODO: uncomment after strategy is implemented
+        # TODO: show what actual outcome was
         """
         while run_game > 0:
             if game.random_move() < 0:
