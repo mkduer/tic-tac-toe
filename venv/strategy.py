@@ -23,6 +23,10 @@ class Strategy:
 
         # Initialize the payoff table
         self.initialize_table()
+        print(f'INITIALIZED TABLE:')
+        for payoff in self.payoff_table:
+            print(payoff)
+        print(f'\n')
 
         # Monte Carlo Sampling
         self.process_children()
@@ -34,11 +38,7 @@ class Strategy:
         """
         Initialize payoff table with specified dimensions
         """
-        for child, piece, p1_position, legal_positions in self.children:
-            print(f'child state with legal positions ({legal_positions}):')
-            child.display()
         self.row = len(self.children)
-        print(f'total children: {self.row}')
         self.col = self.row - 1
 
         # initialize table to contain all of the samples
@@ -56,6 +56,7 @@ class Strategy:
 
         # go through all of player 1's legal moves
         for board, piece, p1_position, legal_positions in self.children:
+            print(f'PLAYER1: {player1}')
             moves_remain = True
             payoff = (-1, -1 , -1)
             other_piece = self.other_player(piece)
@@ -70,33 +71,42 @@ class Strategy:
                 board.display()
 
                 for col in range(self.col):
-                    self.payoff_table[player1][player2] = Sample(deepcopy(board.state), piece, other_piece,
+                    print(f'SAMPLE being added to payoff table[{player1}][{col}] with payoff {payoff}')
+                    self.payoff_table[player1][col] = Sample(deepcopy(board.state), piece, other_piece,
                                                          p1_position, nan, deepcopy(payoff))
-
-                print(f'PAYOFF TABLE player1: {player1}, player2: {player2}')
-                self.payoff_table[player1][player2].display_sample()
 
             # If valid moves remain, go through all of them to represent player 2's reponses
             if moves_remain:
-                print(f'FIRST PLAYER\'s payoff: {payoff} and Board State (continuing to second player)')
+                print(f'FIRST PLAYER\'s position {p1_position}, current payoff: {payoff} and'
+                      f'\nBoard State (continuing to second player):')
                 board.display()
 
                 for position in range(self.col):
+                    moves_remain = True
+                    print(f'PLAYER2: {player2}')
                     sample_board = Board(deepcopy(board.state), board.move_count, board.current_player, child=True)
                     _, winner = sample_board.add_piece(other_piece, position=legal_positions[position])
 
-                    # process game_state and winner values and get sample values
-                    print(f'\nSECOND PLAYER\'s payoff: {payoff} and Board State')
-                    sample_board.display()
+                    if winner == 0 or winner == 1:
+                        moves_remain = False
+                        payoff = self.monte_carlo_sampling(sample_board, other_piece, legal_positions[position],
+                                                           moves_remain=moves_remain)
+                        print(f'SECOND PLAYER\'s payoff: {payoff} and Board State:')
+                        sample_board.display()
 
-                    # start sampling
-                    payoff = self.monte_carlo_sampling(sample_board, other_piece, legal_positions[position])
+                    if moves_remain:
+                        # process game_state and winner values and get sample values
+                        print(f'\nSECOND PLAYER\'s position {legal_positions[position]}, current payoff: {payoff} and'
+                              f'\nBoard State:')
+                        sample_board.display()
+
+                        # start sampling
+                        payoff = self.monte_carlo_sampling(sample_board, other_piece, legal_positions[position])
 
                     # save the Sample to the specific coordinate it belongs to in the payoff table
+                    print(f'SAMPLE being added to payoff table[{player1}][{player2}] with payoff {payoff}')
                     self.payoff_table[player1][player2] = Sample(deepcopy(sample_board.state), piece, other_piece, p1_position,
                                                          legal_positions[position], deepcopy(payoff))
-                    print(f'PAYOFF TABLE player1: {player1}, player2: {player2}')
-                    self.payoff_table[player1][player2].display_sample()
                     player2 += 1
                     if player2 == self.col:
                         player2 = 0
@@ -113,14 +123,7 @@ class Strategy:
         """
         # if there were no legal moves after player 1 placed its piece
         if not moves_remain:
-            print(f'NO LEGAL MOVES after PLAYER ONE placed its piece')
-            _, winner = board.winning_state(piece, position)
-            return self.game_state(winner)
-
-        # if there were no legal moves after player 2 placed its piece
-        # check for stalemate, winners
-        if board.legal_move() == -1:
-            print(f'NO LEGAL MOVES after PLAYER TWO placed its piece')
+            print(f'NO LEGAL MOVES after PLAYER {piece} placed its piece in position {position}')
             _, winner = board.winning_state(piece, position)
             return self.game_state(winner)
 
@@ -130,7 +133,7 @@ class Strategy:
         X_total = 0
         stalemates = 0
         while count < C.SAMPLES:
-            print(f'RUN MCMC SAMPLING because legal moves remain')
+            print(f'START mcmc sampling')
             O_won, X_won, no_win = self.sample_run(deepcopy(board))
             if (O_won, X_won, no_win) == (-1, -1, -1):
                 assert('An error occurred with the gameplay. These values should not be returned')
@@ -157,8 +160,9 @@ class Strategy:
             position = board.random_legal_move()
             player = board.get_current_player()
             player = board.alternate_player(player)
+            print(f'player: {player}, position: {position}')
             _, winner = board.add_piece(player, position)
-            print(f'new state:')
+            print(f'new state with winner = {winner}:')
             board.display()
             if winner == -1:
                 end_game = True
@@ -215,4 +219,7 @@ class Strategy:
             print(payoff)
         for payoff in self.payoff_table:
             for p in payoff:
-                p.display_sample()
+                if p is None:
+                    print(f'FIX ME -- None Value')
+                else:
+                    p.display_sample()
