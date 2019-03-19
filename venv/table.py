@@ -1,39 +1,117 @@
 from sample import Sample
 from tabulate import tabulate
 import numpy as np
+import constant as C
 
 class Table:
 
-    def __init__(self, player_order: [int], legal_positions: [int], payoff_table: [Sample]):
+    def __init__(self, player_order: [int], legal_positions: [int], samples: [Sample]):
         """
         :param player_order: which player goes first/second (first player's strategies are listed in left-hand
         column, and second player's strategy is listed on first row)
         :param legal_positions: all of the legal positions remaining
-        :param payoff_table: payoff table with strategies played, payoff values from monte carlo sampling, and game state
+        :param samples: samples with strategies played, payoff values from monte carlo sampling, and game state
         """
         self.first_player, self.second_player = self.represent_players(player_order)
         self.legal_positions = legal_positions
-        self.payoff_table = payoff_table
+        self.samples = samples
         self.y_axis_length = len(self.legal_positions)
         self.x_axis_length = self.y_axis_length - 1
+        self.payoff_table = [[None] * C.TOTAL_STRATEGIES for sample in range(C.TOTAL_STRATEGIES)]
+
+        const_string_length = 9
+        padding = 2
+        self.cell_length = const_string_length + padding + len(str(C.SAMPLES))
+        self.max_length = (self.cell_length + 1) * (C.TOTAL_STRATEGIES + 1)
+
+    def pretty_print(self, item: str):
+        """
+        Pretty prints the item passed in so that the overall matrix looks pretty and is more easily readable
+        :param item: item of string type
+        """
+
+        # if the item is empty or of None value, print empty spaces
+        if not item:
+            item = '|' + (self.cell_length * ' ')
+            print(item, end='')
+
+        # otherwise, pad the item appropriately
+        else:
+            item_length = len(item)
+            extra_spaces = self.cell_length - item_length
+            left_spaces = extra_spaces // 2
+            right_spaces = extra_spaces - left_spaces
+            pretty_item = '|' + (left_spaces * ' ') + item + (right_spaces * ' ')
+            print(pretty_item, end='')
+
+    def print_header(self):
+        """
+        Prints payoff table title
+        """
+
+        # Print Title
+        title = 'PAYOFF TABLE     (' + str(self.first_player) + '\'s wins, ' + \
+                str(self.second_player) + '\'s wins, stalemates)'
+        title_len = len(title)
+        extra_spaces = self.max_length - title_len
+        left_spaces = extra_spaces // 2
+        right_spaces = extra_spaces - left_spaces
+        title_details = (left_spaces * ' ') + title + (right_spaces * ' ')
+        print(title_details)
+
+
+        self.print_border_line(breakline=False)
+
+        # Print Player Details
+        player_details = 'Player 1 (' + str(self.first_player) + '), Player 2 (' + str(self.second_player) + ')'
+        detail_len = len(player_details)
+        extra_spaces = self.max_length - detail_len
+        left_spaces = extra_spaces // 2
+        right_spaces = extra_spaces - left_spaces
+        pretty_details = (left_spaces * ' ') + player_details + (right_spaces * ' ')
+        print(pretty_details, end='')
+
+    def print_border_line(self, breakline: bool=True):
+        """
+        Prints a border line
+        :param breakline: adds a newline if True, no newline if False
+        """
+        if breakline:
+            print('\n' + (self.max_length * '-'))
+        else:
+            print((self.max_length * '-'))
 
     def display_table(self):
         """
         Displays the entire Payoff Table in a human-readable format
         """
-        for payoff in payoff_matrix:
-            print(payoff)
+
+        self.print_header()
+
+        for payoff in self.payoff_table:
+            self.print_border_line()
+            for p in payoff:
+                self.pretty_print(str(p))
+        self.print_border_line()
 
     def create_human_readable_table(self):
         """
         Creates the entire Payoff Table in a human-readable format
         """
-        payoff_matrix = [[None] * 9 for sample in range(9)]
+        strategies = list(np.arange(0, C.TOTAL_STRATEGIES, dtype=int))
 
-        for payoff in self.payoff_table:
+        for payoff in self.samples:
             for p in payoff:
                 p1, p2 = p.get_strategy()
-                payoff_matrix[p1][p2] = p.get_payoff()
+                self.payoff_table[p1][p2] = str(p.get_payoff())
+
+        # add player 1's strategies
+        for strategy, payoff in zip(strategies, self.payoff_table):
+            payoff.insert(0, strategy)
+
+        # prepend player 2's strategies
+        strategies.insert(0, 'Strategies')
+        self.payoff_table.insert(0, strategies)
 
     def represent_players(self, player_order) -> str:
         """
