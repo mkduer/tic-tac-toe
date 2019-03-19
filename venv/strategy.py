@@ -44,7 +44,6 @@ class Strategy:
 
         # initialize table to contain all of the samples
         self.payoff_table = [[None] * self.col for sample in range(self.row)]
-        print(f'ROW: {self.row}, COL: {self.col}')
 
     def process_children(self):
         """
@@ -122,6 +121,10 @@ class Strategy:
         O_total = 0
         X_total = 0
         stalemates = 0
+
+        if C.SAMPLES < 0 or C.SAMPLES > 999:
+            raise ValueError(f'SAMPLES constant in constant.py must be within [0, 999] inclusive.')
+
         while count < C.SAMPLES:
             O_won, X_won, no_win = self.sample_run(deepcopy(board))
             if (O_won, X_won, no_win) == (-1, -1, -1):
