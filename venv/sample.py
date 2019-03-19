@@ -13,6 +13,15 @@ class Sample:
         self.p2_position = p2_position
         self.payoff = payoff            # payoff probability from sampling (O won, X won, stalemate)
 
+    def get_strategy(self):
+        """
+        :return: the tuple of strategies played in order
+        """
+        return self.p1_position, self.p2_position
+
+    def get_payoff(self):
+        return self.payoff
+
     def display_payoff(self):
         """
         Display payoff details only

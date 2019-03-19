@@ -44,6 +44,7 @@ class Strategy:
 
         # initialize table to contain all of the samples
         self.payoff_table = [[None] * self.col for sample in range(self.row)]
+        print(f'ROW: {self.row}, COL: {self.col}')
 
     def process_children(self):
         """
@@ -193,8 +194,7 @@ class Strategy:
         """
         Displays payoff table
         """
-        print(f'======== PAYOFF TABLE ({self.row}x{self.col}) ========')  # TODO: delete
-        table = Table()
         player_order = (self.first_player, self.second_player)
-        table.display_payoff_table(player_order, self.original_legal_positions, self.payoff_table)
-
+        table = Table(player_order, self.original_legal_positions, self.payoff_table)
+        table.create_human_readable_table()
+        table.display_table()
