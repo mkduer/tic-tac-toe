@@ -24,11 +24,7 @@ class Board:
         else:
             self.state = state
 
-        self.children = []      # contains a quartet of:
-                                # child state
-                                # piece that was added
-                                # position piece was added to
-                                # remaining legal positions
+        self.children = []
 
     def discover_children(self) -> []:
         """
@@ -237,8 +233,8 @@ class Board:
         count = 0
 
         # if an invalid number of moves is selected, the board is not generated
-        if C.MOVES < 0 or C.MOVES > 7:
-            assert(f'{C.MOVES} in constant.py must be a value between [0,7] inclusively')
+        if C.MOVES < 0 or C.MOVES > 7 or count > C.MOVES:
+            raise ValueError(f'{C.MOVES} in constant.py must be a value between [0,7] inclusively')
 
         # create the board, one legal move at a time
         piece = 0

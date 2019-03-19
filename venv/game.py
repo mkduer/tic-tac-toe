@@ -1,6 +1,7 @@
 from board import Board
 from strategy import Strategy
 import constant as C
+from sample import Sample
 
 class Game:
 
@@ -12,13 +13,17 @@ class Game:
         self.players = [self.max_player, self.min_player]
         self.winner = -1
 
-    def analyze_strategy(self):
+    def analyze_strategy(self) -> [Sample]:
         """
         Applies game theory to analyze strategies from the current board state
         """
         strategy = Strategy(self.board)
-        strategy.analysis()
-        # strategy.display_payoff_table() # TODO
+        payoff_table = strategy.analysis()
+
+        # Display Payoff Table TODO: delete after Table class is implemented
+        strategy.display_payoff_table()
+
+        return payoff_table
 
     def reset(self) -> int:
         """
@@ -107,11 +112,13 @@ def main():
         print('\nSTARTING BOARD:')
         game.display()
         print('\n')
-        game.analyze_strategy()
+        payoff_table = game.analyze_strategy()
+        # TODO: display payoff table with only payoffs
+        # TODO: display payoff table with all resulting details
 
         # while the game is running, make moves
         # TODO: uncomment after strategy is implemented
-        # TODO: show what actual outcome was
+        # TODO: show what actual outcome was compared to suggested strategies
         """
         while run_game > 0:
             if game.random_move() < 0:
