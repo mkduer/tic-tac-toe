@@ -13,12 +13,17 @@ class Sample:
         self.p2_position = p2_position
         self.payoff = payoff            # payoff probability from sampling (O won, X won, stalemate)
 
+    def display_payoff(self):
+        """
+        Display payoff details only
+        """
+        print(self.payoff)
+        
     def display_sample(self):
         """
         Display sample details
         """
-        print(f'\n=== SAMPLE ==='
-              f'\n({self.piece(self.player1)}, {self.piece(self.player2)}) '
+        print(f'\n({self.piece(self.player1)}, {self.piece(self.player2)}) '
               f'added to ({self.p1_position}, {self.p2_position})'
               f'\npayoff: {self.payoff}')
         self.display_state(self.state)
