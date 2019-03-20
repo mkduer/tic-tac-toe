@@ -19,8 +19,8 @@ class Game:
         """
         strategy = Strategy(self.board)
         payoff_table = strategy.process()
-        strategy.display_payoff_table()
         strategy.analyze()
+        strategy.display_payoff_table()
 
     def reset(self) -> int:
         """

@@ -49,32 +49,37 @@ class Strategy:
         for payoff in self.payoff_table:
             for p in payoff:
                 p1, p2, stalemate = p.get_payoff()
+                p1_strategy, p2_strategy = p.get_strategy()
 
+                if type(p2_strategy) != int:
+                    for move in self.original_legal_positions:
+                        player2_strategies[move] = 0
                 # check if p1 doesn't have dominant strategies
-                if p2 > p1 and p2 > stalemate:
-                    strategy, _ = p.get_strategy()
-                    player1_strategies[strategy] = 0
-                    if player2_strategies[strategy] != 0:
-                        player2_strategies[strategy] = 1
+                else:
+                    if p2 > p1:
+                        player1_strategies[p1_strategy] = 0
+                        if player2_strategies[p1_strategy] != 0:
+                            player2_strategies[p1_strategy] = 1
+
+                    # check if stalemate is equal to or exceeds p2
+                    if stalemate >= p2:
+                        player2_strategies[p2_strategy] = 0
+
+                # check if stalemate is equal to or exceeds p1
+                if stalemate >= p1:
+                    player1_strategies[p1_strategy] = 0
 
                 # check if p2 doesn't have dominant strategies
-                elif p1 > p2 and p1 > stalemate:
-                    p1_strategy, strategy = p.get_strategy()
+                elif p1 > p2:
                     if player1_strategies[p1_strategy] != 0:
                         player1_strategies[p1_strategy] = 1
                     # if p2 is a nan, it means that player1 already won
-                    if type(strategy) == int:
-                        player2_strategies[strategy] = 0
-
-                # check if stalemate exceeds p1
-                elif stalemate > p1:
-                    strategy, _ = p.get_strategy()
-                    player1_strategies[strategy] = 0
-
-                # check if stalemate exceeds p2
-                elif stalemate > p2:
-                    _, strategy = p.get_strategy()
-                    player2_strategies[strategy] = 0
+                    # so set all of those strategy outcomes as non-dominant
+                    if type(p2_strategy) != int:
+                        for move in self.original_legal_positions:
+                            player2_strategies[move] = 0
+                    else:
+                        player2_strategies[p2_strategy] = 0
 
         # TODO: return if any players have a dominant strategy
         p1_dominant_strategies = []
@@ -85,10 +90,24 @@ class Strategy:
             elif player2_strategies[strategy] == 1:
                 p2_dominant_strategies.append(strategy)
 
-        print(f'PLAYER 1 dominant strategies: {p1_dominant_strategies}')
-        print(f'PLAYER 2 dominant strategies: {p2_dominant_strategies}')
+        print(f'PLAYER 1 ({self.piece(self.first_player)}) dominant strategies: {p1_dominant_strategies}')
+        print(f'PLAYER 2 ({self.piece(self.second_player)}) dominant strategies: {p2_dominant_strategies}\n')
 
-
+    @staticmethod
+    def piece(value: int) -> str:
+        """
+        Convert integer value of piece into the string equivalent for the game
+         0 ~> 'X'
+         1 ~> 'O'
+        -2 ~> ' '
+        :param value: integer representation of piece
+        :return: string representation of piece
+        """
+        if value < 0:
+            return ' '
+        if value > 0:
+            return 'O'
+        return 'X'
 
     def initialize_table(self):
         """
@@ -114,7 +133,8 @@ class Strategy:
         # go through all of player 1's legal moves
         for board, self.first_player, p1_position, legal_positions in self.children:
             if original_positions:
-                self.original_legal_positions = legal_positions
+                self.original_legal_positions = deepcopy(legal_positions)
+                self.original_legal_positions.append(p1_position)
                 no_moves = False
 
             moves_remain = True
