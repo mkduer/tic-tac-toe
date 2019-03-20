@@ -1,6 +1,7 @@
 from sample import Sample
 import numpy as np
 import constant as C
+from math import nan
 
 class Table:
 
@@ -49,14 +50,26 @@ class Table:
         """
 
         # Print Title
-        title = 'PAYOFF TABLE     (Player 1\'s wins, ' + \
-                'Player 2\'s wins, Stalemates)'
+        title = 'PAYOFF TABLE     (' + str(self.first_player) + '\'s wins, ' + \
+                str(self.second_player) + '\'s wins, stalemates)'
         title_len = len(title)
         extra_spaces = self.max_length - title_len
         left_spaces = extra_spaces // 2
         right_spaces = extra_spaces - left_spaces
         title_details = (left_spaces * ' ') + title + (right_spaces * ' ')
-        print(title_details, end='')
+        print(title_details)
+
+
+        self.print_border_line(breakline=False)
+
+        # Print Player Details
+        player_details = 'Player 1 (' + str(self.first_player) + '), Player 2 (' + str(self.second_player) + ')'
+        detail_len = len(player_details)
+        extra_spaces = self.max_length - detail_len
+        left_spaces = extra_spaces // 2
+        right_spaces = extra_spaces - left_spaces
+        pretty_details = (left_spaces * ' ') + player_details + (right_spaces * ' ')
+        print(pretty_details, end='')
 
     def print_border_line(self, breakline: bool=True):
         """
@@ -87,10 +100,19 @@ class Table:
         """
         strategies = list(np.arange(0, C.TOTAL_STRATEGIES, dtype=int))
 
+        # build payoff table from strategies
         for payoff in self.samples:
             for p in payoff:
                 p1, p2 = p.get_strategy()
-                self.payoff_table[p1][p2] = str(p.get_payoff())
+
+                # Catch condition if p2 is a floating nan
+                # This means that p1 already won the game and p2 has no strategies
+                if type(p2) == int:
+                    self.payoff_table[p1][p2] = str(p.get_payoff())
+                else:
+                    for moves in self.legal_positions:
+                        if moves != p1:
+                            self.payoff_table[p1][moves] = str(p.get_payoff())
 
         # add player 1's strategies
         for strategy, payoff in zip(strategies, self.payoff_table):
@@ -111,8 +133,7 @@ class Table:
         for i in range(len(player_order)):
             if player_order[i] == 0:
                 players[i] = 'X'
-            else:
+            elif player_order[i] == 1:
                 players[i] = 'O'
 
         return players[0], players[1]
-

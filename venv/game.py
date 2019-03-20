@@ -18,8 +18,9 @@ class Game:
         Applies game theory to analyze strategies from the current board state
         """
         strategy = Strategy(self.board)
-        payoff_table = strategy.analysis()
+        payoff_table = strategy.process()
         strategy.display_payoff_table()
+        strategy.analyze()
 
     def reset(self) -> int:
         """
