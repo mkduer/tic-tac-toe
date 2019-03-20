@@ -13,17 +13,13 @@ class Game:
         self.players = [self.max_player, self.min_player]
         self.winner = -1
 
-    def analyze_strategy(self) -> [Sample]:
+    def analyze_strategy(self):
         """
         Applies game theory to analyze strategies from the current board state
         """
         strategy = Strategy(self.board)
         payoff_table = strategy.analysis()
-
-        # Display Payoff Table TODO: delete after Table class is implemented
         strategy.display_payoff_table()
-
-        return payoff_table
 
     def reset(self) -> int:
         """

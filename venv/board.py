@@ -18,7 +18,7 @@ class Board:
 
             # set board if specified
             if C.RANDOM and not child:
-                self.current_player = self.random_board()
+                self.random_board()
             elif C.STATIC:
                 self.current_player = self.static_board()
         else:
@@ -67,7 +67,7 @@ class Board:
 
         # set board if specified
         if C.RANDOM:
-            self.current_player = self.random_board()
+            self.random_board()
         elif C.STATIC:
             self.current_player = self.static_board()
 
@@ -228,7 +228,7 @@ class Board:
     def random_board(self) -> int:
         """
         Creates a randomly generated, legal board that may be a set number of moves into a game
-        :return 1 if a random board is successfully created, 0 otherwise
+        :return the piece of the current player
         """
         count = 0
 
@@ -265,31 +265,30 @@ class Board:
                 self.end_game = False
                 self.winning_player = -1
 
-        return 1
+        self.current_player = piece
 
     def static_board(self) -> int:
         """
         Creates a statically set board: [0, -1, 1, -1, 0, -1, -1, -1, 1]
 
-                  O |   | X
+                  X |   | O
                   ---------
-        Board~>     | O |
+        Board~>     | X |
                   ---------
-                    |   | X
+                    |   | O
 
-        :return next player in game, which should always be 0 assuming traditional game play
         """
         state = [0, -1, 1, -1, 0, -1, -1, -1, 1]
         state_np = np.asarray(state, dtype=int)
         self.state = np.reshape(state_np, (C.DIMENSION, C.DIMENSION))
-        return 0
+        self.current_player = 0
 
     @staticmethod
     def piece(value: int) -> str:
         """
         Convert integer value of piece into the string equivalent for the game
-         0 ~> 'O'
-         1 ~> 'X'
+         0 ~> 'X'
+         1 ~> 'O'
         -2 ~> ' '
         :param value: integer representation of piece
         :return: string representation of piece
@@ -297,8 +296,8 @@ class Board:
         if value < 0:
             return ' '
         if value > 0:
-            return 'X'
-        return 'O'
+            return 'O'
+        return 'X'
 
     def display(self):
         """

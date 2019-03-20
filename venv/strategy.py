@@ -17,11 +17,9 @@ class Strategy:
         self.second_player = -1
         self.original_legal_positions = []
 
-
-    def analysis(self) -> [Sample]:
+    def analysis(self):
         """
         Runs all of the steps of analysis from a starting table, to sampling the game states and creating a payoff table
-        :return the resulting payoff table consisting of Samples
         """
 
         # Gather the root state's children
@@ -32,8 +30,6 @@ class Strategy:
 
         # Monte Carlo Sampling
         self.process_children()
-
-        return self.payoff_table
 
     def initialize_table(self):
         """
@@ -116,24 +112,24 @@ class Strategy:
             _, winner = board.winning_state(piece, position)
             return self.game_state(winner)
 
-        # run game SAMPLE number of times while collecting (O won, X won, stalemate) samples
+        # run game SAMPLE number of times while collecting (p1 won, p2 won, stalemate) samples
         count = 0
-        O_total = 0
-        X_total = 0
+        p1_total = 0
+        p2_total = 0
         stalemates = 0
 
         if C.SAMPLES < 0 or C.SAMPLES > 999:
             raise ValueError(f'SAMPLES constant in constant.py must be within [0, 999] inclusive.')
 
         while count < C.SAMPLES:
-            O_won, X_won, no_win = self.sample_run(deepcopy(board))
-            if (O_won, X_won, no_win) == (-1, -1, -1):
+            p1_won, p2_won, no_win = self.sample_run(deepcopy(board))
+            if (p1_won, p2_won, no_win) == (-1, -1, -1):
                 assert('An error occurred with the gameplay. These values should not be returned')
-            O_total += O_won
-            X_total += X_won
+            p1_total += p1_won
+            p2_total += p2_won
             stalemates += no_win
             count += 1
-        return O_total, X_total, stalemates
+        return p1_total, p2_total, stalemates
 
     def sample_run(self, board: Board) -> (int, int, int):
         """
@@ -156,10 +152,10 @@ class Strategy:
                 return 0, 0, 1  # stalemate
             elif winner == 0:
                 end_game = True
-                return 1, 0, 0  # O won
+                return 1, 0, 0  # X won
             elif winner == 1:
                 end_game = True
-                return 0, 1, 0  # X won
+                return 0, 1, 0  # O won
 
         return -1, -1 ,-1
 
