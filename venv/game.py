@@ -19,7 +19,7 @@ class Game:
         """
         strategy = Strategy(self.board)
         payoff_table = strategy.process()
-        strategy.analyze()
+        strategy.dominant_strategies()
         strategy.display_payoff_table()
 
     def reset(self) -> int:
@@ -48,7 +48,7 @@ class Game:
         Adds the player's piece to a legal space if one exists
         :return 0 if no more legal moves remain, 1 otherwise
         """
-        if self.running():
+        if self.running() == (1, 1):
             position = self.board.random_legal_move()
             return self.move(position)
         return 0
@@ -88,8 +88,8 @@ def end_game(reason: int, winner: int):
     :param winner: 0 or 1 if there was a winner, -1 otherwise
     """
     if reason == 0:
-        print(f'====== GAME OVER! ======')
-        print(f'Winner is Player {winner}')
+        print(f'\n====== GAME OVER! ======')
+        print(f'Actual Winner is Player {winner}')
         print(f'========================\n')
     else:
         print(f'====== GAME OVER: STALEMATE ======\n')
@@ -97,37 +97,10 @@ def end_game(reason: int, winner: int):
 
 def main():
     game = Game()
-    game_count = 0
-
-    # run total games
-    while game_count < C.TOTAL_GAMES:
-        if game_count > 0:
-            game.reset()
-
-        run_game = 1
-
-        print('\nSTARTING BOARD:')
-        game.display()
-        print('\n')
-        payoff_table = game.analyze_strategy()
-        # TODO: display payoff table with only payoffs
-        # TODO: display payoff table with all resulting details
-
-        # while the game is running, make moves
-        # TODO: uncomment after strategy is implemented
-        # TODO: show what actual outcome was compared to suggested strategies
-        """
-        while run_game > 0:
-            if game.random_move() < 0:
-                game.running(False)
-            game.display()
-
-            run_game, winner = game.running()
-            game.switch_player()
-
-        end_game(run_game, winner)
-        """
-        game_count += 1
+    print('\nSTARTING BOARD:')
+    game.display()
+    print('\n')
+    payoff_table = game.analyze_strategy()
 
 
 if __name__ == '__main__':

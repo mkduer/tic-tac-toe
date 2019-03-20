@@ -52,7 +52,6 @@ class Table:
         # Print Title
         title = '(pl: rows, p2: cols)     PAYOFF TABLE     (' + str(self.first_player) + '\'s wins, ' + \
                 str(self.second_player) + '\'s wins, stalemates)'
-        #title = 'PAYOFF TABLE     (Player 1\'s wins, Player 2\'s wins, Stalemates)'
         title_len = len(title)
         extra_spaces = self.max_length - title_len
         left_spaces = extra_spaces // 2
