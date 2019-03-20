@@ -32,13 +32,6 @@ class Strategy:
         # Monte Carlo Sampling
         self.process_children()
 
-    def analyze(self):
-        """
-        Analyzes whether there is a dominant strategy or Nash Equilibrium
-        """
-        self.dominant_strategies()
-        # TODO: nash equilibrium
-
     def dominant_strategies(self):
         """
         Prints whether any dominant strategies exist for either player
