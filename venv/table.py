@@ -1,5 +1,4 @@
 from sample import Sample
-from tabulate import tabulate
 import numpy as np
 import constant as C
 
@@ -50,26 +49,14 @@ class Table:
         """
 
         # Print Title
-        title = 'PAYOFF TABLE     (' + str(self.first_player) + '\'s wins, ' + \
-                str(self.second_player) + '\'s wins, stalemates)'
+        title = 'PAYOFF TABLE     (Player 1\'s wins, ' + \
+                'Player 2\'s wins, Stalemates)'
         title_len = len(title)
         extra_spaces = self.max_length - title_len
         left_spaces = extra_spaces // 2
         right_spaces = extra_spaces - left_spaces
         title_details = (left_spaces * ' ') + title + (right_spaces * ' ')
-        print(title_details)
-
-
-        self.print_border_line(breakline=False)
-
-        # Print Player Details
-        player_details = 'Player 1 (' + str(self.first_player) + '), Player 2 (' + str(self.second_player) + ')'
-        detail_len = len(player_details)
-        extra_spaces = self.max_length - detail_len
-        left_spaces = extra_spaces // 2
-        right_spaces = extra_spaces - left_spaces
-        pretty_details = (left_spaces * ' ') + player_details + (right_spaces * ' ')
-        print(pretty_details, end='')
+        print(title_details, end='')
 
     def print_border_line(self, breakline: bool=True):
         """
@@ -123,9 +110,9 @@ class Table:
 
         for i in range(len(player_order)):
             if player_order[i] == 0:
-                players[i] = 'O'
-            else:
                 players[i] = 'X'
+            else:
+                players[i] = 'O'
 
         return players[0], players[1]
 

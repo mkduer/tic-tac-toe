@@ -54,8 +54,8 @@ class Sample:
     def piece(value: int) -> str:
         """
         Convert integer value of piece into the string equivalent for the game
-         0 ~> 'O'
-         1 ~> 'X'
+         0 ~> 'X'
+         1 ~> 'O'
         -2 ~> ' '
         :param value: integer representation of piece
         :return: string representation of piece
@@ -63,5 +63,5 @@ class Sample:
         if value < 0:
             return ' '
         if value > 0:
-            return 'X'
-        return 'O'
+            return 'O'
+        return 'X'
