@@ -4,6 +4,7 @@ from copy import deepcopy
 from sample import Sample
 from math import nan
 from table import Table
+import numpy as np
 
 class Strategy:
 
@@ -17,9 +18,9 @@ class Strategy:
         self.second_player = -1
         self.original_legal_positions = []
 
-    def analysis(self):
+    def process(self):
         """
-        Runs all of the steps of analysis from a starting table, to sampling the game states and creating a payoff table
+        Processes valid game states for sampling and creating a payoff table.
         """
 
         # Gather the root state's children
@@ -30,6 +31,64 @@ class Strategy:
 
         # Monte Carlo Sampling
         self.process_children()
+
+    def analyze(self):
+        """
+        Analyzes whether there is a dominant strategy or Nash Equilibrium
+        """
+        self.dominant_strategies()
+        # TODO: nash equilibrium
+
+    def dominant_strategies(self):
+        """
+        Prints whether any dominant strategies exist for either player
+        """
+        player1_strategies = np.full((1, C.TOTAL_STRATEGIES), -1, dtype=int).ravel()
+        player2_strategies = np.full((1, C.TOTAL_STRATEGIES), -1, dtype=int).ravel()
+
+        for payoff in self.payoff_table:
+            for p in payoff:
+                p1, p2, stalemate = p.get_payoff()
+
+                # check if p1 doesn't have dominant strategies
+                if p2 > p1 and p2 > stalemate:
+                    strategy, _ = p.get_strategy()
+                    player1_strategies[strategy] = 0
+                    if player2_strategies[strategy] != 0:
+                        player2_strategies[strategy] = 1
+
+                # check if p2 doesn't have dominant strategies
+                elif p1 > p2 and p1 > stalemate:
+                    p1_strategy, strategy = p.get_strategy()
+                    if player1_strategies[p1_strategy] != 0:
+                        player1_strategies[p1_strategy] = 1
+                    # if p2 is a nan, it means that player1 already won
+                    if type(strategy) == int:
+                        player2_strategies[strategy] = 0
+
+                # check if stalemate exceeds p1
+                elif stalemate > p1:
+                    strategy, _ = p.get_strategy()
+                    player1_strategies[strategy] = 0
+
+                # check if stalemate exceeds p2
+                elif stalemate > p2:
+                    _, strategy = p.get_strategy()
+                    player2_strategies[strategy] = 0
+
+        # TODO: return if any players have a dominant strategy
+        p1_dominant_strategies = []
+        p2_dominant_strategies = []
+        for strategy in range(C.TOTAL_STRATEGIES):
+            if player1_strategies[strategy] == 1:
+                p1_dominant_strategies.append(strategy)
+            elif player2_strategies[strategy] == 1:
+                p2_dominant_strategies.append(strategy)
+
+        print(f'PLAYER 1 dominant strategies: {p1_dominant_strategies}')
+        print(f'PLAYER 2 dominant strategies: {p2_dominant_strategies}')
+
+
 
     def initialize_table(self):
         """
