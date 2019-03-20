@@ -57,19 +57,7 @@ class Table:
         left_spaces = extra_spaces // 2
         right_spaces = extra_spaces - left_spaces
         title_details = (left_spaces * ' ') + title + (right_spaces * ' ')
-        print(title_details)
-
-
-        self.print_border_line(breakline=False)
-
-        # Print Player Details
-        player_details = 'Player 1 (' + str(self.first_player) + '), Player 2 (' + str(self.second_player) + ')'
-        detail_len = len(player_details)
-        extra_spaces = self.max_length - detail_len
-        left_spaces = extra_spaces // 2
-        right_spaces = extra_spaces - left_spaces
-        pretty_details = (left_spaces * ' ') + player_details + (right_spaces * ' ')
-        print(pretty_details, end='')
+        print(title_details, end='')
 
     def print_border_line(self, breakline: bool=True):
         """

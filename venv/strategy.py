@@ -43,54 +43,52 @@ class Strategy:
         """
         Prints whether any dominant strategies exist for either player
         """
-        p1_dominant, p2_dominant, stalemate = True, True, True
-        player1_strategies = np.ones((1, C.TOTAL_STRATEGIES), dtype=bool)
-        player2_strategies = np.ones((1, C.TOTAL_STRATEGIES), dtype=bool)
-        stalemates = np.zeros((1, C.TOTAL_STRATEGIES), dtype=int)
+        player1_strategies = np.full((1, C.TOTAL_STRATEGIES), -1, dtype=int).ravel()
+        player2_strategies = np.full((1, C.TOTAL_STRATEGIES), -1, dtype=int).ravel()
 
-        print(f'DOMINANT STRATEGIES?')
         for payoff in self.payoff_table:
             for p in payoff:
                 p1, p2, stalemate = p.get_payoff()
-                print(f'sample payoff: {p1}, {p2}')
-
-                # if p2 is a nan, it means that player1 already won
-                if type(p2) != int:
-                    _, strategy = p.get_strategy()
-                    print(f'p2 doesn\'t have a dominant strategy for {str(strategy)}')
-                    player2_strategies[0][strategy] = 0
 
                 # check if p1 doesn't have dominant strategies
                 if p2 > p1 and p2 > stalemate:
                     strategy, _ = p.get_strategy()
-                    print(f'p1 doesn\'t have a dominant strategy for {strategy}')
-                    player1_strategies[0][strategy] = 0
+                    player1_strategies[strategy] = 0
+                    if player2_strategies[strategy] != 0:
+                        player2_strategies[strategy] = 1
 
                 # check if p2 doesn't have dominant strategies
                 elif p1 > p2 and p1 > stalemate:
-                    _, strategy = p.get_strategy()
-                    print(f'p2 doesn\'t have a dominant strategy for {strategy}')
-                    player2_strategies[0][strategy] = 0
+                    p1_strategy, strategy = p.get_strategy()
+                    if player1_strategies[p1_strategy] != 0:
+                        player1_strategies[p1_strategy] = 1
+                    # if p2 is a nan, it means that player1 already won
+                    if type(strategy) == int:
+                        player2_strategies[strategy] = 0
 
                 # check if stalemate exceeds p1
                 elif stalemate > p1:
                     strategy, _ = p.get_strategy()
-                    print(f'p1 doesn\'t have a dominant strategy for {strategy}')
-                    player1_strategies[0][strategy] = 0
+                    player1_strategies[strategy] = 0
 
                 # check if stalemate exceeds p2
                 elif stalemate > p2:
                     _, strategy = p.get_strategy()
-                    print(f'p2 doesn\'t have a dominant strategy for {strategy}')
-                    player2_strategies[0][strategy] = 0
+                    player2_strategies[strategy] = 0
 
-            print(f'player1\'s strategies: {player1_strategies}')
-            print(f'player2\'s strategies: {player2_strategies}')
-            print(f'stalemate: {stalemates}')
+        # TODO: return if any players have a dominant strategy
+        p1_dominant_strategies = []
+        p2_dominant_strategies = []
+        for strategy in range(C.TOTAL_STRATEGIES):
+            if player1_strategies[strategy] == 1:
+                p1_dominant_strategies.append(strategy)
+            elif player2_strategies[strategy] == 1:
+                p2_dominant_strategies.append(strategy)
 
-            # TODO: return if any players have a dominant strategy
+        print(f'PLAYER 1 dominant strategies: {p1_dominant_strategies}')
+        print(f'PLAYER 2 dominant strategies: {p2_dominant_strategies}')
 
-        # TODO check for dominant strategies for player 2
+
 
     def initialize_table(self):
         """
