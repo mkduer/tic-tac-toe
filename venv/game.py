@@ -20,6 +20,7 @@ class Game:
         """
         strategy = Strategy(self.board)
         payoff_table = strategy.process()
+        strategy.compare_strategies()
         strategy.dominant_strategies()
         strategy.display_payoff_table()
 
@@ -90,14 +91,19 @@ class Game:
         Prints end game message
         :param winner: an integer value representing the winning piece or stalemate
         """
+        print(f'\n==================================')
+        print(f'ACTUAL STRATEGY: '
+              f'({self.actual_strategies[0][0]}, {self.actual_strategies[0][1]}) and '
+              f'({self.actual_strategies[1][0]}, {self.actual_strategies[1][1]})')
+
         if winner < 0:
-            print(f'\n====== GAME OVER: STALEMATE ======')
+            print(f'GAME OVER: STALEMATE')
         else:
             piece = self.piece(winner)
-            print(f'\n====== GAME OVER! ======')
-            print(f'Winner is Player {piece}')
+            print(f'GAME OVER: Winner is Player {piece}')
+        print('\n')
+        self.display()
 
-        print(f'ACTUAL STRATEGY: {self.actual_strategies[:2]}')
 
     def piece(self, value: int) -> str:
         """
@@ -132,7 +138,6 @@ def main():
         continue_game, winner = game.running()
         game.switch_player()
     game.end_game(winner)
-    game.display()
 
 if __name__ == '__main__':
     main()
