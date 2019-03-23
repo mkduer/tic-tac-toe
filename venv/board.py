@@ -54,25 +54,6 @@ class Board:
         """
         return self.current_player
 
-    def reset(self) -> int:
-        """
-        Resets the board state
-        :return current player's piece value in order to continue the game
-        """
-        self.current_player = 0
-        self.state.fill(-1)
-        self.move_count = 0
-        self.end_game = False
-        self.winning_player = -1
-
-        # set board if specified
-        if C.RANDOM:
-            self.random_board()
-        elif C.STATIC:
-            self.current_player = self.static_board()
-
-        return self.current_player
-
     def winning_state(self, piece: int, position: int) -> (int, int):
         """
         Checks if the current board state is a winning state

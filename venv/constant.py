@@ -1,5 +1,4 @@
 # game specs
-TOTAL_GAMES = 1         # number of times game is run
 DIMENSION = 3           # rows and columns
 TOTAL_STRATEGIES = 9    # total possible strategies per player
 

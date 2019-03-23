@@ -25,14 +25,6 @@ class Game:
         strategy.dominant_strategies()
         return payoff_table
 
-    def reset(self) -> int:
-        """
-        Resets the game and returns the next player for the new board state
-        :return:
-        """
-        self.current_player = self.board.reset()
-        self.winner = 2
-
     def running(self, playing: bool=True) -> (int, int):
         """
         If a parameter is passed to end game, the game is ended. Otherwise, a check is made to see if the game has ended.
