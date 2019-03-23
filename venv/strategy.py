@@ -49,8 +49,9 @@ class Strategy:
                 p2_dominant_strategies.append(strategy)
 
         # display dominant strategies
-        print(f'PLAYER 1 ({self.piece(self.first_player)}) dominant strategies: {p1_dominant_strategies}')
-        print(f'PLAYER 2 ({self.piece(self.second_player)}) dominant strategies: {p2_dominant_strategies}\n')
+        print('\nDOMINANT STRATEGIES: ')
+        print(f'PLAYER {self.piece(self.first_player)}\'s strategies: {p1_dominant_strategies}')
+        print(f'PLAYER {self.piece(self.second_player)}\'s strategies: {p2_dominant_strategies}\n')
 
     def compare_strategies(self):
         """
@@ -274,11 +275,13 @@ class Strategy:
         """
         return board.discover_children()
 
-    def display_payoff_table(self):
+    def generate_payoff_table(self) -> [[str]]:
         """
-        Displays payoff table
+        Generates payoff table
+        :return the payoff table
         """
         player_order = (self.first_player, self.second_player)
         table = Table(player_order, self.original_legal_positions, self.payoff_table)
         table.create_human_readable_table()
         table.display_table()
+        return table.payoff_table

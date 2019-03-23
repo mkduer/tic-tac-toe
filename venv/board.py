@@ -39,7 +39,7 @@ class Board:
 
         for position in legal_positions:
             all_positions = []
-            child = Board(deepcopy(self.state), self.move_count, self.current_player, child=True)
+            child = Board(deepcopy(self.state), self.move_count, self.alternate_player(self.current_player), child=True)
             piece = child.alternate_player(self.current_player)
             child.add_piece(piece=piece, position=position)
             all_positions = deepcopy(legal_positions)

@@ -50,7 +50,7 @@ class Table:
         """
 
         # Print Title
-        title = '(pl: rows, p2: cols)     PAYOFF TABLE     (' + str(self.first_player) + '\'s wins, ' + \
+        title = 'PAYOFF TABLE     (' + str(self.first_player) + '\'s wins, ' + \
                 str(self.second_player) + '\'s wins, stalemates)'
         title_len = len(title)
         extra_spaces = self.max_length - title_len
@@ -58,6 +58,18 @@ class Table:
         right_spaces = extra_spaces - left_spaces
         title_details = (left_spaces * ' ') + title + (right_spaces * ' ')
         print(title_details, end='')
+        self.print_border_line()
+
+        # Print Player Details
+        player_details = 'Player ' + str(self.first_player) + ' represented by rows (left to right), ' \
+                         'Player ' + str(self.second_player) + ' represented by columns (top to bottom)'
+
+        player_details_len = len(player_details)
+        extra_spaces = self.max_length - player_details_len
+        left_spaces = extra_spaces // 2
+        right_spaces = extra_spaces - left_spaces
+        player_details_details = (left_spaces * ' ') + player_details + (right_spaces * ' ')
+        print(player_details_details, end='')
 
     def print_border_line(self, breakline: bool=True):
         """

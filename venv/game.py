@@ -19,10 +19,11 @@ class Game:
         Applies game theory to analyze strategies from the current board state
         """
         strategy = Strategy(self.board)
-        payoff_table = strategy.process()
+        strategy.process()
         strategy.compare_strategies()
+        payoff_table = strategy.generate_payoff_table()
         strategy.dominant_strategies()
-        strategy.display_payoff_table()
+        return payoff_table
 
     def reset(self) -> int:
         """
@@ -86,23 +87,27 @@ class Game:
         else:
             self.current_player = 0
 
-    def end_game(self, winner: int):
+    def end_game(self, winner: int, payoff_table: [[str]]):
         """
         Prints end game message
         :param winner: an integer value representing the winning piece or stalemate
         """
-        print(f'\n==================================')
-        print(f'ACTUAL STRATEGY: '
-              f'({self.actual_strategies[0][0]}, {self.actual_strategies[0][1]}) and '
-              f'({self.actual_strategies[1][0]}, {self.actual_strategies[1][1]})')
-
         if winner < 0:
-            print(f'GAME OVER: STALEMATE')
+            print(f'\nGAME OVER: STALEMATE')
         else:
             piece = self.piece(winner)
-            print(f'GAME OVER: Winner is Player {piece}')
-        print('\n')
-        self.display()
+            print(f'\nGAME OVER: Winner is Player {piece}')
+
+        player1_strategy = self.actual_strategies[0][1]
+        player2_strategy = self.actual_strategies[1][1]
+        print(f'ACTUAL STRATEGIES USED: '
+              f'({self.actual_strategies[0][0]}, {player1_strategy}) and '
+              f'({self.actual_strategies[1][0]}, {player2_strategy})')
+
+        print(f'\nPayoff values for the combined strategies ({player1_strategy}, {player2_strategy}): '
+              f'{payoff_table[player1_strategy + 1][player2_strategy + 1]}')
+
+        print(f'\n==================================')
 
 
     def piece(self, value: int) -> str:
@@ -130,14 +135,16 @@ def main():
     payoff_table = game.analyze_strategy()
 
     # while the game is running, make moves
+    print(f'GAME PLAY:', end='')
     while continue_game > 0:
         if game.random_move() < 0:
             game.running(False)
-        print(f'\n--------------------------')
-        game.display()
-        continue_game, winner = game.running()
-        game.switch_player()
-    game.end_game(winner)
+        else:
+            print('\n')
+            game.display()
+            continue_game, winner = game.running()
+            game.switch_player()
+    game.end_game(winner, payoff_table)
 
 if __name__ == '__main__':
     main()
