@@ -112,7 +112,7 @@ class Board:
         :param piece: piece to add
         :param position: position in which to add the piece
         :return tuple (0, -1) if the game was stalemate,
-                tuple (1, player_piece) if won where player piece indicates winner,
+                tuple (1, player_piece) if won, 'player_piece' indicates the winner
                 tuple (1, 2) if game is continuing
         """
         self.current_player = piece
@@ -191,7 +191,7 @@ class Board:
 
     def legal_move(self, position: int=-2) -> int:
         """
-        Check if any legal positions remain on the board, or if the specificly stated position is legal
+        Check if any legal positions remain on the board, or if the specifically stated position is legal
         :param position: a specific position or, by default, an invalid position of -2
         :return: -1 if there are no more legal positions,
                  position [0-8] if the specific position is not legal
