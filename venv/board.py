@@ -39,7 +39,7 @@ class Board:
 
         for position in legal_positions:
             all_positions = []
-            child = Board(deepcopy(self.state), self.move_count, self.current_player, child=True)
+            child = Board(deepcopy(self.state), self.move_count, self.alternate_player(self.current_player), child=True)
             piece = child.alternate_player(self.current_player)
             child.add_piece(piece=piece, position=position)
             all_positions = deepcopy(legal_positions)
@@ -52,25 +52,6 @@ class Board:
         """
         :return returns the current player
         """
-        return self.current_player
-
-    def reset(self) -> int:
-        """
-        Resets the board state
-        :return current player's piece value in order to continue the game
-        """
-        self.current_player = 0
-        self.state.fill(-1)
-        self.move_count = 0
-        self.end_game = False
-        self.winning_player = -1
-
-        # set board if specified
-        if C.RANDOM:
-            self.random_board()
-        elif C.STATIC:
-            self.current_player = self.static_board()
-
         return self.current_player
 
     def winning_state(self, piece: int, position: int) -> (int, int):

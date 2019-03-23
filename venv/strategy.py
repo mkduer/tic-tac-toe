@@ -17,6 +17,8 @@ class Strategy:
         self.first_player = -1
         self.second_player = -1
         self.original_legal_positions = []
+        self.player1_strategies = np.full((1, C.TOTAL_STRATEGIES), -1, dtype=int).ravel()
+        self.player2_strategies = np.full((1, C.TOTAL_STRATEGIES), -1, dtype=int).ravel()
 
     def process(self):
         """
@@ -36,55 +38,65 @@ class Strategy:
         """
         Prints whether any dominant strategies exist for either player
         """
-        player1_strategies = np.full((1, C.TOTAL_STRATEGIES), -1, dtype=int).ravel()
-        player2_strategies = np.full((1, C.TOTAL_STRATEGIES), -1, dtype=int).ravel()
+        p1_dominant_strategies = []
+        p2_dominant_strategies = []
+
+        # discover if any players have a dominant strategy
+        for strategy in range(C.TOTAL_STRATEGIES):
+            if self.player1_strategies[strategy] == 1:
+                p1_dominant_strategies.append(strategy)
+            elif self.player2_strategies[strategy] == 1:
+                p2_dominant_strategies.append(strategy)
+
+        # display dominant strategies
+        print('\nDOMINANT STRATEGIES: ')
+        print(f'PLAYER {self.piece(self.first_player)}\'s strategies: {p1_dominant_strategies}')
+        print(f'PLAYER {self.piece(self.second_player)}\'s strategies: {p2_dominant_strategies}\n')
+
+    def compare_strategies(self):
+        """
+        Compares winning and stalemate outcomes based on sampling, defining if a strategy is dominant for a player
+        """
 
         for payoff in self.payoff_table:
             for p in payoff:
                 p1, p2, stalemate = p.get_payoff()
                 p1_strategy, p2_strategy = p.get_strategy()
 
+                # if p2's strategy consists of nan, then p1 already won and p2 has no dominant strategy
                 if type(p2_strategy) != int:
                     for move in self.original_legal_positions:
-                        player2_strategies[move] = 0
-                # check if p1 doesn't have dominant strategies
+                        self.player2_strategies[move] = 0
+
+                # if p2 has a better strategy than p1, p1 has no dominant strategy
                 else:
                     if p2 > p1:
-                        player1_strategies[p1_strategy] = 0
-                        if player2_strategies[p1_strategy] != 0:
-                            player2_strategies[p1_strategy] = 1
+                        self.player1_strategies[p1_strategy] = 0
+                        if self.player2_strategies[p1_strategy] != 0:
+                            self.player2_strategies[p1_strategy] = 1
 
                     # check if stalemate is equal to or exceeds p2
                     if stalemate >= p2:
-                        player2_strategies[p2_strategy] = 0
+                        self.player2_strategies[p2_strategy] = 0
 
                 # check if stalemate is equal to or exceeds p1
                 if stalemate >= p1:
-                    player1_strategies[p1_strategy] = 0
+                    self.player1_strategies[p1_strategy] = 0
 
-                # check if p2 doesn't have dominant strategies
+                # if p1 has a better strategy than p2, p2 has no dominant strategy
                 elif p1 > p2:
-                    if player1_strategies[p1_strategy] != 0:
-                        player1_strategies[p1_strategy] = 1
+                    if self.player1_strategies[p1_strategy] != 0:
+                        self.player1_strategies[p1_strategy] = 1
+
                     # if p2 is a nan, it means that player1 already won
                     # so set all of those strategy outcomes as non-dominant
                     if type(p2_strategy) != int:
                         for move in self.original_legal_positions:
-                            player2_strategies[move] = 0
+                            self.player2_strategies[move] = 0
+
+                    # otherwise, just set the specific strategy as non-dominant
                     else:
-                        player2_strategies[p2_strategy] = 0
-
-        # TODO: return if any players have a dominant strategy
-        p1_dominant_strategies = []
-        p2_dominant_strategies = []
-        for strategy in range(C.TOTAL_STRATEGIES):
-            if player1_strategies[strategy] == 1:
-                p1_dominant_strategies.append(strategy)
-            elif player2_strategies[strategy] == 1:
-                p2_dominant_strategies.append(strategy)
-
-        print(f'PLAYER 1 ({self.piece(self.first_player)}) dominant strategies: {p1_dominant_strategies}')
-        print(f'PLAYER 2 ({self.piece(self.second_player)}) dominant strategies: {p2_dominant_strategies}\n')
+                        self.player2_strategies[p2_strategy] = 0
 
     @staticmethod
     def piece(value: int) -> str:
@@ -161,13 +173,15 @@ class Strategy:
                         payoff = self.monte_carlo_sampling(sample_board, self.second_player, legal_positions[position])
 
                     # save the Sample to the specific coordinate it belongs to in the payoff table
-                    self.payoff_table[player1][player2] = Sample(deepcopy(sample_board.state), self.first_player, self.second_player, p1_position,
-                                                         legal_positions[position], deepcopy(payoff))
+                    self.payoff_table[player1][player2] = Sample(deepcopy(sample_board.state), self.first_player,
+                                                                 self.second_player, p1_position,
+                                                                 legal_positions[position], deepcopy(payoff))
 
                     # set payoff table location according to relevant players
                     player2 += 1
                     if player2 == self.col:
                         player2 = 0
+
             player1 += 1
 
     def monte_carlo_sampling(self, board: Board, piece: int, position: int, moves_remain: bool=True) -> (int, int, int):
@@ -196,7 +210,7 @@ class Strategy:
         while count < C.SAMPLES:
             p1_won, p2_won, no_win = self.sample_run(deepcopy(board))
             if (p1_won, p2_won, no_win) == (-1, -1, -1):
-                assert('An error occurred with the gameplay. These values should not be returned')
+                raise ValueError('An error occurred with the gameplay. These values should not be returned')
             p1_total += p1_won
             p2_total += p2_won
             stalemates += no_win
@@ -261,11 +275,13 @@ class Strategy:
         """
         return board.discover_children()
 
-    def display_payoff_table(self):
+    def generate_payoff_table(self) -> [[str]]:
         """
-        Displays payoff table
+        Generates payoff table
+        :return the payoff table
         """
         player_order = (self.first_player, self.second_player)
         table = Table(player_order, self.original_legal_positions, self.payoff_table)
         table.create_human_readable_table()
         table.display_table()
+        return table.payoff_table
