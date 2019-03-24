@@ -1,8 +1,6 @@
 # tic_tac_toe
-A project generating tic tac toe gameplay and random game states.
+A tic-tac-toe board of randomly chosen moves is generated up to a set number of moves (MOVES constant in constant.py).
 
-By applying Monte Carlo sampling to generate expected values for random states, a payoff table is created for the next two moves by both players and analysis is done using game theory such as dominant strategies and Nash Equilibrium.
+Monte Carlo sampling is applied to the initial game state to predict expected values for random states. From the resulting samplings, a payoff table is created for the next two moves (aka strategies) by both players. Game theory analysis is applied to discover dominant strategies for both players.
 
-Given Extra Time:
-* Also implement a Minimax or Negamax recommendation for the best move
-* Display using React.js
+After the payoff table is displayed, the game is played to completion using random move generation and the actual strategy is juxtaposed with the payoff values for the strategies that were implemented.
