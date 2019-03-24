@@ -204,7 +204,7 @@ class Strategy:
         p2_total = 0
         stalemates = 0
 
-        if C.SAMPLES < 0 or C.SAMPLES > 999:
+        if C.SAMPLES < 0:
             raise ValueError(f'SAMPLES constant in constant.py must be within [0, 999] inclusive.')
 
         while count < C.SAMPLES:

@@ -1,7 +1,7 @@
 from sample import Sample
 import numpy as np
 import constant as C
-from math import nan
+from math import nan, log10, ceil
 
 class Table:
 
@@ -20,7 +20,7 @@ class Table:
         self.payoff_table = [[None] * C.TOTAL_STRATEGIES for sample in range(C.TOTAL_STRATEGIES)]
 
         const_string_length = 9
-        padding = 2
+        padding = int(ceil(log10(C.SAMPLES)))
         self.cell_length = const_string_length + padding + len(str(C.SAMPLES))
         self.max_length = (self.cell_length + 1) * (C.TOTAL_STRATEGIES + 1)
 
