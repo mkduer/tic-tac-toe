@@ -8,5 +8,5 @@ RANDOM = True           # initializes a random board if True
 MOVES = 2               # number of moves when initializing the random board [0, 7] inclusively or ValueError
 
 # game theory strategy specs
-SAMPLES = 30            # number of samplings [0, 999]
+SAMPLES = 200            # number of samplings [0, 999]
 

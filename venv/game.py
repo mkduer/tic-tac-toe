@@ -91,16 +91,18 @@ class Game:
             print(f'\nGAME OVER: Winner is Player {piece}')
 
         player1_strategy = self.actual_strategies[0][1]
-        player2_strategy = self.actual_strategies[1][1]
         print(f'ACTUAL STRATEGIES USED: '
-              f'({self.actual_strategies[0][0]}, {player1_strategy}) and '
-              f'({self.actual_strategies[1][0]}, {player2_strategy})')
+              f'({self.actual_strategies[0][0]}, {player1_strategy})', end='')
 
-        print(f'\nPayoff values for the combined strategies ({player1_strategy}, {player2_strategy}): '
-              f'{payoff_table[player1_strategy + 1][player2_strategy + 1]}')
-
-        print(f'\n==================================')
-
+        if len(self.actual_strategies) > 1:
+            player2_strategy = self.actual_strategies[1][1]
+            print(f' and ({self.actual_strategies[1][0]}, {player2_strategy})')
+            print(f'Payoff values for the combined strategies ({player1_strategy}, {player2_strategy}): '
+                  f'{payoff_table[player1_strategy + 1][player2_strategy + 1]}')
+        else:
+            print(f'\nSecond player had no valid strategy. Player 1\'s strategy: '
+                  f'({player1_strategy}) with payoff (30, 0, 0)')
+        print('\n==================================')
 
     def piece(self, value: int) -> str:
         """
@@ -121,9 +123,8 @@ def main():
     game = Game()
     continue_game = 1
 
-    print('\nSTARTING BOARD:')
+    print(f'\nSTARTING BOARD ({C.MOVES} moves in):')
     game.display()
-    print('\n')
     payoff_table = game.analyze_strategy()
 
     # while the game is running, make moves
@@ -132,10 +133,10 @@ def main():
         if game.random_move() < 0:
             game.running(False)
         else:
-            print('\n')
-            game.display()
             continue_game, winner = game.running()
             game.switch_player()
+            print('\n')
+            game.display()
     game.end_game(winner, payoff_table)
 
 if __name__ == '__main__':
