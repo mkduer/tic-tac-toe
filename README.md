@@ -7,8 +7,8 @@ After the payoff table is displayed, the game is played to completion using rand
 
 # instructions
 * Clone or fork the repo.
-* Run ```pip install -r requirements.txt``` to get the required dependencies.
 * Go into **venv** and run ```game.py``` with your IDE or with python3 onward (this program was created with Python 3.7).
+* Run ```pip install -r requirements.txt``` to get the required dependencies.
 
 # modifications
 * Adjust the number of samplings by going into ```constant.py``` and changing the ```SAMPLES``` constant. 
